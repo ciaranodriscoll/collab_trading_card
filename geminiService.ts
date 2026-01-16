@@ -18,18 +18,15 @@ function buildPrompt(data: CardData): string {
 
     1.  A CHARACTER PORTRAIT: A visually stunning, epic portrait that reflects their skills and quest.
         - The character's appearance MUST BE ANDROGYNOUS with an AMBIGUOUS GENDER. Do not make them clearly male or female.
-        - If their skills involve data, depict them as an ethereal 'Data Weaver' manipulating glowing threads of information or runes.
-        - If they are a psychologist, they could be a 'Mind Mage' with psionic energy radiating from them.
         - The image should have a dark, mystical, and scholarly feel, but with high fantasy elements like magical glows, ancient artifacts, or intricate, flowing robes. The character should look intelligent and powerful.
-        - The character will ideally not be human. 
+        - The character will ideally not be human.
         - Do NOT include any text, borders, or card elements on the image itself. Just the character portrait.
 
     2.  A FANTASY CLASS: A fitting fantasy class title based on the profile.
         - Example Class: "Cognitive Sorcerer" or "Data Weaver"
         - This should be creative and relevant to the researcher's profile.
 
-    The response should have one image part and one text part. The text part must be a valid JSON object with the key "class".
-    Example JSON: {"class": "Cognitive Sorcerer"}
+    The response MUST have one image part (the portrait) and one text part. The text part should contain ONLY the fantasy class title and nothing else.
   `;
 }
 
@@ -56,12 +53,10 @@ export const generateCardDetails = async (data: CardData): Promise<GeneratedCard
           const base64String = part.inlineData.data;
           imageUrl = `data:${part.inlineData.mimeType};base64,${base64String}`;
         } else if (part.text) {
-          try {
-            const cleanedText = part.text.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(cleanedText);
-            characterClass = parsed.class || characterClass;
-          } catch (e) {
-            console.error("Failed to parse JSON from text part:", part.text, e);
+          const potentialClass = part.text.trim();
+          if (potentialClass) {
+            // Remove any markdown like backticks
+            characterClass = potentialClass.replace(/`/g, '');
           }
         }
       }
