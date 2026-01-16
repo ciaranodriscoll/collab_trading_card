@@ -17,7 +17,7 @@ function buildPrompt(data: CardData): string {
     Based on this profile, generate two things:
 
     1.  A CHARACTER PORTRAIT: A visually stunning, epic portrait that reflects their skills and quest.
-        - The character's appearance MUST BE ANDROGYNOUS with an AMBIGUOUS GENDER. Do not make them clearly male or female.
+        - The character's appearance MUST BE ANDROGYNOUS and should be a creature. 
         - The image should have a dark, mystical, and scholarly feel, but with high fantasy elements like magical glows, ancient artifacts, or intricate, flowing robes. The character should look intelligent and powerful.
         - The character will ideally not be human.
         - Do NOT include any text, borders, or card elements on the image itself. Just the character portrait.

@@ -19,6 +19,21 @@ const CardSection: React.FC<{ title: string; icon: React.ReactNode; children: Re
     </div>
 );
 
+// Helper function to convert a data URL to a Blob
+function dataURLtoBlob(dataurl: string) {
+    const arr = dataurl.split(',');
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) throw new Error('Invalid data URL');
+    const mime = mimeMatch[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
+
 
 const TradingCard: React.FC<TradingCardProps> = ({ cardData, generatedData }) => {
     const [isUploading, setIsUploading] = useState(false);
@@ -55,21 +70,15 @@ const TradingCard: React.FC<TradingCardProps> = ({ cardData, generatedData }) =>
         try {
             const canvas = await getCanvas();
             const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
-            // The API expects a raw base64 string, so we remove the data URL prefix
-            const base64Image = dataUrl.split(',')[1];
-            
-            const payload = {
-                image: base64Image,
-                mimeType: "image/jpeg",
-                cardData: cardData
-            };
-            
+            const imageBlob = dataURLtoBlob(dataUrl);
+
+            const formData = new FormData();
+            formData.append('image', imageBlob, 'card.jpeg');
+            formData.append('cardData', JSON.stringify(cardData));
+
             const response = await fetch("http://194.76.26.55:4567/api/upload-image", {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
+                body: formData, // Sending as FormData, not JSON
             });
 
             if (!response.ok) {
